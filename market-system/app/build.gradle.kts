@@ -8,9 +8,10 @@ plugins {
 
 dependencies {
     implementation("org.apache.commons:commons-text")
+    implementation("org.neo4j.driver:neo4j-java-driver:6.0.4")
 }
 
 application {
     // Define the main class for the application.
-    mainClass = "org.frauddetection.kafka.producer.TransactionProducer"
+    mainClass = "org.frauddetection.App"
 }
