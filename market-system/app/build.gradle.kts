@@ -10,6 +10,8 @@ plugins {
 dependencies {
     implementation("org.apache.commons:commons-text")
     implementation("org.neo4j.driver:neo4j-java-driver:6.0.4")
+    implementation("org.apache.kafka:kafka-clients:4.2.0")
+    implementation("io.confluent:kafka-avro-serializer:8.2.0")
 }
 
 application {
