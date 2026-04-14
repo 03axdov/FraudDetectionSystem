@@ -8,18 +8,17 @@ import java.util.UUID;
 
 import org.frauddetection.models.domain.Account;
 import org.frauddetection.models.domain.Customer;
+import org.frauddetection.repositories.AccountRepository;
 
 public class AccountGenerator {
     private static final List<String> ACCOUNT_TYPES = List.of("CHECKING", "SAVINGS", "BUSINESS", "WALLET");
     private static final List<String> COUNTRIES = List.of("DE", "NL", "FR", "ES", "IT", "US", "GB", "SE");
 
     private final Random random;
+    private final AccountRepository accountRepository;
 
-    public AccountGenerator() {
-        this(new Random());
-    }
-
-    public AccountGenerator(Random random) {
+    public AccountGenerator(AccountRepository accountRepository, Random random) {
+        this.accountRepository = accountRepository;
         this.random = random;
     }
 
@@ -33,7 +32,7 @@ public class AccountGenerator {
     public Account generate(Customer customer) {
         Instant createdAt = Instant.now();
 
-        return new Account(
+        Account account = new Account(
             "acct-" + UUID.randomUUID(),
             customer.customerId(),
             ACCOUNT_TYPES.get(random.nextInt(ACCOUNT_TYPES.size())),
@@ -42,5 +41,7 @@ public class AccountGenerator {
             createdAt,
             random.nextDouble() < 0.95
         );
+        accountRepository.save(account);
+        return account;
     }
 }

@@ -14,6 +14,8 @@ import org.frauddetection.models.domain.Merchant;
 import org.frauddetection.models.enums.TransactionStatus;
 import org.frauddetection.models.enums.TransactionType;
 import org.frauddetection.models.events.Transaction;
+import org.frauddetection.repositories.AccountRepository;
+import org.frauddetection.repositories.TransactionRepository;
 
 public class TransactionGenerator {
     private static final List<String> CHANNELS = List.of("MOBILE", "WEB", "POS", "ATM", "API");
@@ -23,12 +25,12 @@ public class TransactionGenerator {
     private static final List<String> CURRENCIES = List.of("EUR", "USD", "GBP", "SEK");
 
     private final Random random;
+    private final TransactionRepository transactionRepository;
+    private final AccountRepository accountRepository;
 
-    public TransactionGenerator() {
-        this(new Random());
-    }
-
-    public TransactionGenerator(Random random) {
+    public TransactionGenerator(TransactionRepository transactionRepository, AccountRepository accountRepository, Random random) {
+        this.transactionRepository = transactionRepository;
+        this.accountRepository = accountRepository;
         this.random = random;
     }
 
@@ -56,7 +58,7 @@ public class TransactionGenerator {
         fromAccount.withdraw(amount);   // Fine for now
         toAccount.deposit(amount);  // Fine for now
 
-        return new Transaction(
+        Transaction transaction = new Transaction(
             "txn-" + UUID.randomUUID(),
             Instant.now(),
             fromAccount.accountId(),
@@ -72,17 +74,25 @@ public class TransactionGenerator {
             merchant.country(),
             CITIES.get(random.nextInt(CITIES.size()))
         );
+        accountRepository.save(fromAccount);
+        accountRepository.save(toAccount);
+        transactionRepository.save(transaction);
+        return transaction;
     }
 
     private Account randomAccount(List<Account> accounts) {
-        return accounts.get(random.nextInt(accounts.size()));
+        Account account;
+        do {
+            account = accounts.get(random.nextInt(accounts.size()));
+        } while (!account.active());
+        return account;
     }
 
     private Account randomDifferentAccount(List<Account> accounts, String excludedAccountId) {
         Account account;
         do {
             account = randomAccount(accounts);
-        } while (account.accountId().equals(excludedAccountId));
+        } while (account.accountId().equals(excludedAccountId) || !account.active());
         return account;
     }
 

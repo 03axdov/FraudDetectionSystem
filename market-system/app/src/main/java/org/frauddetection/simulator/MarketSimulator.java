@@ -10,8 +10,15 @@ import org.frauddetection.models.domain.Device;
 import org.frauddetection.models.domain.IpAddress;
 import org.frauddetection.models.domain.Merchant;
 import org.frauddetection.models.events.Transaction;
+import org.frauddetection.repositories.AccountRepository;
+import org.frauddetection.repositories.CustomerRepository;
+import org.frauddetection.repositories.DeviceRepository;
+import org.frauddetection.repositories.IpAddressRepository;
+import org.frauddetection.repositories.MerchantRepository;
+import org.frauddetection.repositories.TransactionRepository;
+import org.neo4j.driver.Driver;
 
-public class TransactionSimulator {
+public class MarketSimulator {
     private final Random random;
     private final CustomerGenerator customerGenerator;
     private final AccountGenerator accountGenerator;
@@ -20,18 +27,25 @@ public class TransactionSimulator {
     private final MerchantGenerator merchantGenerator;
     private final TransactionGenerator transactionGenerator;
 
-    public TransactionSimulator() {
-        this(new Random());
+    public MarketSimulator(Driver driver) {
+        this(new Random(), driver);
     }
 
-    public TransactionSimulator(Random random) {
+    public MarketSimulator(Random random, Driver driver) {
         this.random = random;
-        this.customerGenerator = new CustomerGenerator(random);
-        this.accountGenerator = new AccountGenerator(random);
-        this.deviceGenerator = new DeviceGenerator(random);
-        this.ipAddressGenerator = new IpAddressGenerator(random);
-        this.merchantGenerator = new MerchantGenerator(random);
-        this.transactionGenerator = new TransactionGenerator(random);
+        AccountRepository accountRepository = new AccountRepository(driver);
+        CustomerRepository customerRepository = new CustomerRepository(driver);
+        DeviceRepository deviceRepository = new DeviceRepository(driver);
+        IpAddressRepository ipAddressRepository = new IpAddressRepository(driver);
+        MerchantRepository merchantRepository = new MerchantRepository(driver);
+        TransactionRepository transactionRepository = new TransactionRepository(driver);
+
+        this.customerGenerator = new CustomerGenerator(customerRepository, random);
+        this.accountGenerator = new AccountGenerator(accountRepository, random);
+        this.deviceGenerator = new DeviceGenerator(deviceRepository, random);
+        this.ipAddressGenerator = new IpAddressGenerator(ipAddressRepository, random);
+        this.merchantGenerator = new MerchantGenerator(merchantRepository, random);
+        this.transactionGenerator = new TransactionGenerator(transactionRepository, accountRepository, random);
     }
 
     public SimulationSnapshot simulateMarket(int customerCount, int maxAccountsPerCustomer, int transactionCount) {

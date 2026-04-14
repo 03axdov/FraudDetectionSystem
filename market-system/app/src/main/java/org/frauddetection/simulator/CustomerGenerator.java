@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.frauddetection.models.domain.Customer;
 import org.frauddetection.models.enums.BehaviorProfile;
+import org.frauddetection.repositories.CustomerRepository;
 
 public class CustomerGenerator {
     private static final List<String> FIRST_NAMES = List.of(
@@ -18,22 +19,22 @@ public class CustomerGenerator {
     );
 
     private final Random random;
+    private final CustomerRepository customerRepository;
 
-    public CustomerGenerator() {
-        this(new Random());
-    }
-
-    public CustomerGenerator(Random random) {
+    public CustomerGenerator(CustomerRepository customerRepository, Random random) {
+        this.customerRepository = customerRepository;
         this.random = random;
     }
 
     public Customer generate() {
-        return new Customer(
+        Customer customer = new Customer(
             "cust-" + UUID.randomUUID(),
             randomName(),
             randomCreatedAt(),
             weightedRandomProfile()
         );
+        customerRepository.save(customer);
+        return customer;
     }
 
     private BehaviorProfile weightedRandomProfile() {

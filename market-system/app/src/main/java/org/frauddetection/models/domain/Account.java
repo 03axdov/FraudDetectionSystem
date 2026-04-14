@@ -15,6 +15,8 @@ public class Account {
     private final Instant createdAt;
     private boolean active;
 
+    private final Object balanceLock = new Object();
+
     public Account(
         String accountId,
         String customerId,
@@ -62,11 +64,17 @@ public class Account {
     }
 
     public void deposit(BigDecimal amount) {
-        this.balance = this.balance.add(amount);
+        ensureActive();
+        synchronized (balanceLock) {
+            this.balance = this.balance.add(amount);
+        }
     }
 
     public void withdraw(BigDecimal amount) {
-        this.balance = this.balance.subtract(amount);
+        ensureActive();
+        synchronized (balanceLock) {
+            this.balance = this.balance.subtract(amount);
+        }
     }
 
     public void deactivate() {
@@ -79,9 +87,15 @@ public class Account {
             "customerId", customerId,
             "accountType", accountType,
             "country", country,
-            "balance", balance,
+            "balance", balance.longValue(),
             "createdAt", ZonedDateTime.ofInstant(createdAt, ZoneOffset.UTC),
             "active", active
         );
+    }
+
+    private void ensureActive() {
+        if (!active) {
+            throw new IllegalStateException("Account is inactive");
+        }
     }
 }

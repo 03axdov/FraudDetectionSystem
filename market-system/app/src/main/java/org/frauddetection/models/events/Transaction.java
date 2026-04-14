@@ -31,7 +31,7 @@ public record Transaction(
             Map.entry("timestamp", ZonedDateTime.ofInstant(timestamp, ZoneOffset.UTC)),
             Map.entry("fromAccountId", fromAccountId),
             Map.entry("toAccountId", toAccountId),
-            Map.entry("amount", amount),
+            Map.entry("amount", amount.longValue()),
             Map.entry("currency", currency),
             Map.entry("transactionType", transactionType.name()),
             Map.entry("status", status.name()),

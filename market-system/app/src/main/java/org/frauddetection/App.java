@@ -1,12 +1,9 @@
 package org.frauddetection;
 
 import org.neo4j.driver.GraphDatabase;
-import org.frauddetection.models.domain.Customer;
-import org.frauddetection.repositories.CustomerRepository;
+import org.frauddetection.simulator.MarketSimulator;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
-import java.time.Instant;
-import org.frauddetection.models.enums.BehaviorProfile;
 
 public class App {
     public static void main(String[] args) {
@@ -19,16 +16,8 @@ public class App {
         );
 
         try {
-            CustomerRepository customerRepository = new CustomerRepository(driver);
-        
-            Customer testCustomer = new Customer(
-                "1283947832409",
-                "Axel",
-                Instant.now(),
-                BehaviorProfile.BURST_FRAUDSTER
-            );
-
-            customerRepository.save(testCustomer);
+            MarketSimulator marketSimulator = new MarketSimulator(driver);
+            marketSimulator.simulateMarket(25, 3, 200);
         } finally {
             driver.close();
         }

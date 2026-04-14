@@ -6,25 +6,26 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.frauddetection.models.domain.Device;
+import org.frauddetection.repositories.DeviceRepository;
 
 public class DeviceGenerator {
     private static final List<String> DEVICE_TYPES = List.of("ANDROID", "IOS", "WEB_BROWSER", "POS_TERMINAL");
 
     private final Random random;
+    private final DeviceRepository deviceRepository;
 
-    public DeviceGenerator() {
-        this(new Random());
-    }
-
-    public DeviceGenerator(Random random) {
+    public DeviceGenerator(DeviceRepository deviceRepository, Random random) {
+        this.deviceRepository = deviceRepository;
         this.random = random;
     }
 
     public Device generate() {
-        return new Device(
+        Device device = new Device(
             "dev-" + UUID.randomUUID(),
             DEVICE_TYPES.get(random.nextInt(DEVICE_TYPES.size()))
         );
+        deviceRepository.save(device);
+        return device;
     }
 
     public List<Device> generateMany(int count) {
