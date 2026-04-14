@@ -24,7 +24,6 @@ public class App {
             Customer testCustomer = new Customer(
                 "1283947832409",
                 "Axel",
-                "HIGH",
                 Instant.now(),
                 BehaviorProfile.BURST_FRAUDSTER
             );

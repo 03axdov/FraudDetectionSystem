@@ -1,29 +1,26 @@
 package org.frauddetection.repositories;
 
-import org.frauddetection.models.domain.Customer;
+import org.frauddetection.models.domain.Device;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.Session;
 
-
-public class CustomerRepository {
+public class DeviceRepository {
     private final Driver driver;
 
-    public CustomerRepository(Driver driver) {
+    public DeviceRepository(Driver driver) {
         this.driver = driver;
     }
 
-    public void save(Customer customer) {
+    public void save(Device device) {
         try (Session session = driver.session()) {
             session.executeWrite(tx -> {
                 tx.run(
                     """
-                    MERGE (c:Customer {customerId: $customerId})
+                    MERGE (d:Device {deviceId: $deviceId})
                     SET
-                        c.name = $name,
-                        c.createdAt = $createdAt,
-                        c.behaviorProfile = $behaviorProfile
+                        d.deviceType = $deviceType
                     """,
-                    customer.toMap()
+                    device.toMap()
                 );
                 return null;
             });

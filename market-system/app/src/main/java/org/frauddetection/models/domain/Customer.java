@@ -10,7 +10,6 @@ import org.frauddetection.models.enums.BehaviorProfile;
 public record Customer(
     String customerId,
     String name,
-    String riskLevel,
     Instant createdAt,
     BehaviorProfile behaviorProfile
 ) {
@@ -18,7 +17,6 @@ public record Customer(
         return Map.of(
             "customerId", customerId,
             "name", name,
-            "riskLevel", riskLevel,
             "createdAt", ZonedDateTime.ofInstant(createdAt, ZoneOffset.UTC),
             "behaviorProfile", behaviorProfile.name()
         );

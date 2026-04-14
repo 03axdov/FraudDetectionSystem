@@ -1,29 +1,27 @@
 package org.frauddetection.repositories;
 
-import org.frauddetection.models.domain.Customer;
+import org.frauddetection.models.domain.Merchant;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.Session;
 
-
-public class CustomerRepository {
+public class MerchantRepository {
     private final Driver driver;
 
-    public CustomerRepository(Driver driver) {
+    public MerchantRepository(Driver driver) {
         this.driver = driver;
     }
 
-    public void save(Customer customer) {
+    public void save(Merchant merchant) {
         try (Session session = driver.session()) {
             session.executeWrite(tx -> {
                 tx.run(
                     """
-                    MERGE (c:Customer {customerId: $customerId})
+                    MERGE (m:Merchant {merchantId: $merchantId})
                     SET
-                        c.name = $name,
-                        c.createdAt = $createdAt,
-                        c.behaviorProfile = $behaviorProfile
+                        m.category = $category,
+                        m.country = $country
                     """,
-                    customer.toMap()
+                    merchant.toMap()
                 );
                 return null;
             });
