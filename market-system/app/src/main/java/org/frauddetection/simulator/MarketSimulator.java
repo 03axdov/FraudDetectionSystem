@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.frauddetection.kafka.producer.TransactionProducer;
 import org.frauddetection.models.domain.Account;
 import org.frauddetection.models.domain.Customer;
 import org.frauddetection.models.domain.Device;
@@ -26,6 +27,7 @@ public class MarketSimulator {
     private final IpAddressGenerator ipAddressGenerator;
     private final MerchantGenerator merchantGenerator;
     private final TransactionGenerator transactionGenerator;
+    private final TransactionProducer transactionProducer;
 
     public MarketSimulator(Driver driver) {
         this(new Random(), driver);
@@ -46,6 +48,8 @@ public class MarketSimulator {
         this.ipAddressGenerator = new IpAddressGenerator(ipAddressRepository, random);
         this.merchantGenerator = new MerchantGenerator(merchantRepository, random);
         this.transactionGenerator = new TransactionGenerator(transactionRepository, accountRepository, random);
+
+        this.transactionProducer = new TransactionProducer();
     }
 
     public SimulationSnapshot simulateMarket(int customerCount, int maxAccountsPerCustomer, int transactionCount) {
@@ -97,7 +101,9 @@ public class MarketSimulator {
     ) {
         List<Transaction> transactions = new ArrayList<>(transactionCount);
         for (int i = 0; i < transactionCount; i++) {
-            transactions.add(transactionGenerator.generate(accounts, devices, ipAddresses, merchants));
+            Transaction currentTransaction = transactionGenerator.generate(accounts, devices, ipAddresses, merchants);
+            transactionProducer.send(currentTransaction, "transactions");
+            transactions.add(currentTransaction);
         }
         return transactions;
     }

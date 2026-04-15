@@ -1,0 +1,11 @@
+{
+  "type": "record",
+  "name": "AvroTransaction",
+  "namespace": "org.frauddetection.avro",
+  "fields": [
+    {"name": "transactionId", "type": "string"},
+    {"name": "timestamp", "type": {"type": "long", "logicalType": "timestamp-millis"}},
+    {"name": "amount", "type": "double"},
+    {"name": "currency", "type": "string"}
+  ]
+}
