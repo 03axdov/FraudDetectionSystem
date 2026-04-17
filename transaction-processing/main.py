@@ -1,42 +1,31 @@
-from dotenv import load_dotenv
+from pyspark.sql import SparkSession
 import os
-from kafka.TransactionConsumer import TransactionConsumer
-from threading import Event, Thread
-from confluent_kafka.schema_registry import SchemaRegistryClient
-from confluent_kafka.schema_registry.avro import AvroDeserializer
 
-TOPICS = ["transactions"]
 
 if __name__ == "__main__":
-    
-    load_dotenv()
-    
-    conf = {
-        "bootstrap.servers": os.getenv("KAFKA_BOOTSTRAP_SERVERS"),
-        "group.id": "fraud-detectors",
-        "auto.offset.reset": "earliest"
-    }
-    
-    schema_registry_conf = {
-        "url": os.getenv("SCHEMA_REGISTRY_URL")
-    }
-    schema_registry_client = SchemaRegistryClient(schema_registry_conf)
-    avro_deserializer = AvroDeserializer(
-        schema_registry_client
+    spark = (
+        SparkSession.builder
+        .appName("KafkaDebug")
+        .getOrCreate()
     )
     
-    stop_event = Event()
-    transaction_consumer = TransactionConsumer(conf, TOPICS, stop_event, avro_deserializer)
-    
-    transaction_thread = Thread(target=transaction_consumer.start, args=())
+    spark.sparkContext.setLogLevel("WARN")
 
-    transaction_thread.start()
-    
-    try:
-        transaction_thread.join()
-    except KeyboardInterrupt:
-        print("Interrupting consumers...")
-        stop_event.set()
-        
-        transaction_thread.join()
-        print("Consumers stopped.")
+    df = (
+        spark.readStream
+        .format("kafka")
+        .option("kafka.bootstrap.servers", os.getenv("KAFKA_BOOTSTRAP_SERVERS"))
+        .option("subscribe", "transactions")
+        .option("startingOffsets", "earliest")
+        .load()
+    )
+
+    # Print raw data (key + value are binary)
+    query = (
+        df.writeStream
+        .format("console")
+        .option("truncate", False)
+        .start()
+    )
+
+    query.awaitTermination()
