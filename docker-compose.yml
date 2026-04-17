@@ -83,6 +83,19 @@ services:
       schema-registry:
         condition: service_healthy
 
+  transaction-processing:
+    build: ./transaction-processing
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9093
+      SCHEMA_REGISTRY_URL: http://schema-registry:8081
+    depends_on:
+      kafka:
+        condition: service_healthy
+      schema-registry:
+        condition: service_healthy
+      market-system:
+        condition: service_started
+
 volumes:
   neo4j_data:
   neo4j_logs:

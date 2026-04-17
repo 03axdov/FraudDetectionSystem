@@ -12,7 +12,7 @@ if __name__ == "__main__":
     load_dotenv()
     
     conf = {
-        "bootstrap.servers": os.environ("KAFKA_BOOTSTRAP_SERVERS"),
+        "bootstrap.servers": os.getenv("KAFKA_BOOTSTRAP_SERVERS"),
         "group.id": "fraud-detectors",
         "auto.offset.reset": "earliest"
     }
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     transaction_consumer = TransactionConsumer(conf, TOPICS, stop_event, avro_deserializer)
     
     transaction_thread = Thread(target=transaction_consumer.start, args=())
-    
+
     transaction_thread.start()
     
     try:
