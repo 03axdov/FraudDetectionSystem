@@ -52,7 +52,7 @@ public class MarketSimulator {
         this.transactionProducer = new TransactionProducer();
     }
 
-    public SimulationSnapshot simulateMarket(int customerCount, int maxAccountsPerCustomer, int transactionCount) {
+    public SimulationSnapshot simulateMarket(int customerCount, int maxAccountsPerCustomer, int transactionCount) throws InterruptedException {
         if (customerCount <= 0) {
             throw new IllegalArgumentException("customerCount must be greater than zero.");
         }
@@ -98,12 +98,13 @@ public class MarketSimulator {
         List<Device> devices,
         List<IpAddress> ipAddresses,
         List<Merchant> merchants
-    ) {
+    ) throws InterruptedException {
         List<Transaction> transactions = new ArrayList<>(transactionCount);
         for (int i = 0; i < transactionCount; i++) {
             Transaction currentTransaction = transactionGenerator.generate(accounts, devices, ipAddresses, merchants);
             transactionProducer.send(currentTransaction, "transactions");
             transactions.add(currentTransaction);
+            Thread.sleep(200);
         }
         return transactions;
     }

@@ -5,17 +5,12 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, expr
 from pyspark.sql.avro.functions import from_avro
 
-SCHEMA_REGISTRY_URL = os.getenv("SCHEMA_REGISTRY_URL")
 TOPIC = "transactions"
 SUBJECT = f"{TOPIC}-value"
 
-def get_latest_schema(subject: str) -> str:
-    url = f"{SCHEMA_REGISTRY_URL}/subjects/{subject}/versions/latest"
-    resp = requests.get(url, timeout=10)
-    resp.raise_for_status()
-    return resp.json()["schema"]
-
 if __name__ == "__main__":
+    load_dotenv()
+    
     avro_schema_json = get_latest_schema(SUBJECT)
 
     spark = (

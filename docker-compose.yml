@@ -68,7 +68,12 @@ services:
       start_period: 20s
 
   market-system:
-    build: ./market-system
+    image: gradle:8.7-jdk17
+    working_dir: /app
+    volumes:
+      - ./market-system:/app
+      - gradle_cache:/home/gradle/.gradle
+    command: gradle :app:run --no-daemon
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9093
       NEO4J_PASSWORD: ${NEO4J_PASSWORD}
@@ -99,3 +104,4 @@ services:
 volumes:
   neo4j_data:
   neo4j_logs:
+  gradle_cache:

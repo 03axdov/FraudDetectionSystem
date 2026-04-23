@@ -18,7 +18,9 @@ public class App {
         
         try {
             MarketSimulator marketSimulator = new MarketSimulator(driver);
-            marketSimulator.simulateMarket(25, 3, 200);
+            marketSimulator.simulateMarket(25, 3, 10000);
+        } catch (InterruptedException e) {
+            System.out.println("Interrupted: " + e.toString());
         } finally {
             driver.close();
         }

@@ -115,22 +115,22 @@ public class TransactionGenerator {
         return TransactionStatus.REVERSED;
     }
 
-    private BigDecimal  biasedRandomAmount(BigDecimal maxAmount, double biasFactor) {
+    private BigDecimal biasedRandomAmount(BigDecimal maxAmount, double biasFactor) {
         double u = random.nextDouble(1);
         double biased = Math.pow(u, biasFactor);
 
-        return maxAmount.multiply(BigDecimal.valueOf(biased));
+        return maxAmount.multiply(BigDecimal.valueOf(biased)).setScale(2, RoundingMode.UP);
     }
 
     private BigDecimal randomAmount(TransactionType transactionType, Account fromAccount) {
         BigDecimal currentBalance = fromAccount.balance();
         
         BigDecimal amount = switch (transactionType) {
-            case PAYMENT -> biasedRandomAmount(currentBalance, 4);
-            case TRANSFER -> biasedRandomAmount(currentBalance, 3);
-            case WITHDRAWAL -> biasedRandomAmount(currentBalance, 2.5);
-            case DEPOSIT -> biasedRandomAmount(currentBalance.multiply(BigDecimal.valueOf(3)), 4);
-            case REFUND -> biasedRandomAmount(currentBalance.divide(BigDecimal.valueOf(5.0), 2, RoundingMode.UP), 3);
+            case PAYMENT -> biasedRandomAmount(currentBalance, 6);
+            case TRANSFER -> biasedRandomAmount(currentBalance, 7);
+            case WITHDRAWAL -> biasedRandomAmount(currentBalance, 5);
+            case DEPOSIT -> biasedRandomAmount(currentBalance.multiply(BigDecimal.valueOf(3)), 6);
+            case REFUND -> biasedRandomAmount(currentBalance.divide(BigDecimal.valueOf(8), 2, RoundingMode.UP), 3);
         };
 
         return amount.setScale(2, RoundingMode.HALF_UP);
